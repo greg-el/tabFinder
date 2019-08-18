@@ -1,0 +1,33 @@
+{
+    "data": {
+        "results": [
+            {
+            "id": 1111,
+            "song_name": "test_song",
+            "artist_name": "test_artist",
+            "type": "test_type",
+            "part": "",
+            "version": 1,
+            "votes": 1337,
+            "rating": 4.2,
+            "date": "1007424000",
+            "artist_url": "test_artist_url",
+            "tab_url": "test_tab_url"
+            },
+            {
+            "id": 1112,
+            "song_name": "test_song_marketing",
+            "artist_name": "test_artist_marketing",
+            "type": "test_type_marketing",
+            "part": "",
+            "version": 1,
+            "votes": 1337,
+            "rating": 4.2,
+            "date": "1007424000",
+            "artist_url": "test_artist_url_marketing",
+            "tab_url": "test_tab_url_marketing"
+            }
+        ]
+    }
+}
+
