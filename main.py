@@ -6,13 +6,13 @@ import json
 import subprocess
 import re
 
-def get_json_data_as_string(url):
-    song_response = requests.get(url)
-    song_soup = BeautifulSoup(song_response.text, "html.parser")
-    song_json = song_soup.findAll("script")[10]
-    song_str = str(song_json)
-    song_json_output = song_str[39:-45]
-    return song_json_output
+def get_json_string_from_url(url):
+    response = requests.get(url)
+    soup = BeautifulSoup(response.text, "html.parser")
+    json = soup.findAll("script")[10]
+    json_str = str(json)
+    json_output = json_str[39:-45]
+    return json_output
 
 def get_song_data(data):
     song_data = json.loads(data)
@@ -45,26 +45,8 @@ def get_songs_list(data):
 
     return data
 
-
-
-def get_args():
-    parser = argparse.ArgumentParser()
-    parser.add_argument("-s", "--search-song", dest="search")
-    parser.add_argument("-c", "--current-song", action="store_true")
-    args = parser.parse_args()
-
-    if args.current_song:
-        song = subprocess.check_output(["playerctl", "metadata", "title"]).decode("utf-8")
-    else:
-        song = args.search
-
-    return song.rstrip()
-
-
-if __name__ == "__main__":
-    song = get_args()
-    url = f"https://www.ultimate-guitar.com/search.php?search_type=title&value={song}"
-    query_data = get_songs_list(get_json_data_as_string(url))
+def run_song_title(url):
+    query_data = get_songs_list(get_json_string_from_url(url))
     print(query_data)
     for result in query_data:
         print(result["index"], " // ", result["type"], result["song_name"], result["artist"])
@@ -72,6 +54,47 @@ if __name__ == "__main__":
     selection = int(input("\nSelect a tab: "))
     song_url = query_data[selection]["url"]
 
-    song_data = get_song_data(get_json_data_as_string(song_url))
+    song_data = get_song_data(get_json_string_from_url(song_url))
     
     print("\n", song_data)
+
+def run_artist_search(url):
+    json_string = get_json_string_from_url(url)
+    data = json.loads(json_string)
+    result = data["data"]["results"]
+    count = 0
+    output = []
+    for artist in result:
+        tempDict = {"index": count, "artist": artist["artist_name"], "tab_count":artist["tabs_cnt"], "url":artist["artist_url"]}
+        output.append(tempDict)
+        count += 1
+
+    for result in output:
+        print(result["index"], " // ", result["artist"], result["tab_count"], "tabs")
+
+    selection = int(input("\nSelect an artist: "))
+
+    artist_page = get_json_string_from_url("https://www.ultimate-guitar.com" + output[selection]["url"])
+    print(artist_page)
+
+    
+if __name__ == "__main__":
+    parser = argparse.ArgumentParser()
+    parser.add_argument("-a", "--search-artist", dest="artist")
+    parser.add_argument("-s", "--search-song", dest="song")
+    parser.add_argument("-c", "--current-song", action="store_true")
+    args = parser.parse_args()
+    
+    if args.current_song:
+        url = "https://www.ultimate-guitar.com/search.php?search_type=title&value={} {}".format(title, artist)
+        run_song_title(url)
+    elif args.artist != None:
+        url = "https://www.ultimate-guitar.com/search.php?search_type=band&value={}".format(args.artist)
+        run_artist_search(url)
+    else:
+        url = "https://www.ultimate-guitar.com/search.php?search_type=title&value={}".format(args.song)
+        run_song_title(url)
+
+    
+    
+   
