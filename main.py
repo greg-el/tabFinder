@@ -9,8 +9,8 @@ import re
 def get_json_string_from_url(url):
     response = requests.get(url)
     soup = BeautifulSoup(response.text, "html.parser")
-    json = soup.findAll("script")[10]
-    json_str = str(json)
+    json_soup = soup.findAll("script")[12]
+    json_str = str(json_soup)
     json_output = json_str[39:-45]
     return json_output
 
@@ -47,6 +47,7 @@ def get_songs_list(data):
 
 def run_song_title(url):
     query_data = get_songs_list(get_json_string_from_url(url))
+
     for result in query_data:
         print(result["index"], " // ", result["type"], result["song_name"], result["artist"])
 
@@ -88,10 +89,10 @@ def run_artist_search(url):
         "rating":song["rating"],
         "votes":song["votes"]}
 
-        if "version" not in song: //TODO this doesnt work
-            tempDict["version"]:0
+        if "version" not in song: 
+            tempDict["version"] = 0
         else:
-            tempDict["version"]:song["version"]
+            tempDict["version"] = song["version"]
 
         if "type" not in song:
             if song["marketing_type"] == "TabPro" or song["marketing_type"] == "Pro":
